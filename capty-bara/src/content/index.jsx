@@ -43,3 +43,20 @@ myDiv.innerHTML = '<h3>Hello from my Extension!</h3><p>This is a custom overlay.
 
 // Append the div to the body of the YouTube page
 document.body.appendChild(myDiv);
+
+console.log('Capty-Bara content script loaded!')
+
+async function init() {
+  const data = window.ytInitialPlayerResponse
+  const tracks = data?.captions?.playerCaptionsTracklistRenderer?.captionTracks
+  console.log('tracks:', tracks)
+  
+  if (tracks && tracks.length > 0) {
+    const url = tracks[0].baseUrl + '&fmt=vtt'
+    const res = await fetch(url)
+    const text = await res.text()
+    console.log('raw VTT text:', text)
+  }
+}
+
+init()
