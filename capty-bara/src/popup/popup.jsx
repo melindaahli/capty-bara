@@ -77,4 +77,3 @@ function Popup() {
 }
 
 createRoot(document.getElementById('popup-root')).render(<Popup />)
-
