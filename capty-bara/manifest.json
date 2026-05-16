@@ -27,7 +27,7 @@
         "https://m.youtube.com/watch*"
         ],
         "js": ["src/content/index.jsx"],
-        "css": [],
+        "css": ["src/content/index.css"],
         "run_at": "document_idle"
     }
   ],
