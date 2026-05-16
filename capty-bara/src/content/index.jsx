@@ -37,9 +37,43 @@ console.log('Capty-Bara content script loaded!')
 // mount()
 
 // Create the new div
+// const myDiv = document.createElement('div');
+// myDiv.id = 'my-custom-youtube-div';
+// myDiv.innerHTML = '<h3>Hello from my Extension!</h3><p>This is a custom overlay.</p>';
+
+// // Append the div to the body of the YouTube page
+// document.body.appendChild(myDiv);
+
+
+// Create the new div
 const myDiv = document.createElement('div');
 myDiv.id = 'my-custom-youtube-div';
 myDiv.innerHTML = '<h3>Hello from my Extension!</h3><p>This is a custom overlay.</p>';
 
 // Append the div to the body of the YouTube page
 document.body.appendChild(myDiv);
+(function testInjection() {
+    const targetSelector = '#above-the-fold'; // Change this to your target ID
+    let checkCount = 0;
+
+    const interval = setInterval(() => {
+        const target = document.querySelector(targetSelector);
+        checkCount++;
+
+        if (target) {
+            clearInterval(interval);
+            // Create the test div
+            const testDiv = document.createElement('div');
+            testDiv.id = 'dev-test-div';
+            testDiv.style.cssText = 'background: #ff4500; color: white; padding: 15px; font-weight: bold; margin: 10px 0; border-radius: 8px;';
+            testDiv.innerText = '🔥 DevTools Injection Successful!';
+
+            // Inject it at the top of the target element
+            target.insertAdjacentElement('afterbegin', testDiv);
+            console.log('Success: Div injected after ' + checkCount + ' attempts.');
+        } else if (checkCount > 10) {
+            clearInterval(interval);
+            console.error('Error: Target element not found after 5 seconds.');
+        }
+    }, 500);
+})();
