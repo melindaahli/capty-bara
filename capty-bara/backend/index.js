@@ -46,11 +46,11 @@ app.get("/transcript/at-time", async (req, res) => {
   if (!videoId) return res.status(400).json({ error: "Missing videoId" });
   if (!lang) return res.status(400).json({ error: "Missing lang" });
   if (time === undefined) return res.status(400).json({ error: "Missing time" });
-    if (time > 1.5)
-        time = time - 1.5;
+    // if (time > 1.5)
+    //     time = time - 1.5;
   try {
     const transcript = await getTranscript(videoId, lang);
-    const segment = getTranscriptAtTime(transcript, parseFloat(time));
+    const segment = getTranscriptAtTime(transcript, parseFloat(time - 1.5));
     res.json(segment);
   } catch (err) {
     console.error(`[/transcript/at-time] videoId=${videoId} lang=${lang} time=${time}:`, err.message);
