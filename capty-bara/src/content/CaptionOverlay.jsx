@@ -43,6 +43,8 @@ const FONT_FAMILY = {
 };
 
 const DEFAULT_SETTINGS = {
+  captionsEnabled: true,
+  isDarkMode: false,
   primaryLanguage: 'English',
   secondaryLanguage: 'Japanese',
   isSideBySide: false,
@@ -57,7 +59,6 @@ function getVideoId() {
   return new URLSearchParams(window.location.search).get('v');
 }
 
-// Map slider value (0–100) to rem
 function sliderToRem(v) {
   return 0.8 + (v / 100) * 1.7;
 }
@@ -71,7 +72,14 @@ export default function CaptionOverlay() {
   useEffect(() => {
     const keys = Object.keys(DEFAULT_SETTINGS);
     chrome.storage.sync.get(keys, (stored) => {
-      setSettings((prev) => ({ ...prev, ...Object.fromEntries(keys.map(k => [k, stored[k] ?? prev[k]])) }));
+      setSettings((prev) => ({
+        ...prev,
+        ...Object.fromEntries(
+          keys
+            .filter(k => stored[k] !== undefined)
+            .map(k => [k, stored[k]])
+        )
+      }));
     });
 
     const handleChange = (changes) => {
@@ -147,14 +155,23 @@ export default function CaptionOverlay() {
     : { bottom: '14%', left: '50%', transform: 'translateX(-50%)' };
 
   const hasCaption = captions.primary || captions.secondary;
+  if (!settings.captionsEnabled) return null;
 
   const captionFontFamily = FONT_FAMILY[settings.fontFamily] ?? 'Arial, sans-serif';
   const captionFontSize = `${sliderToRem(settings.fontSize)}rem`;
-  const captionColor = COLOR_HEX[settings.fontColor] ?? '#ffffff';
-  const captionBg = BG_RGBA[settings.bgColor] ?? 'rgba(0,0,0,0.7)';
-  const windowBg = BG_RGBA[settings.windowColor] ?? 'transparent';
 
-  // isSideBySide=false → "adjacent" (row), isSideBySide=true → "stacked" (column)
+  const captionColor = settings.fontColor === 'Transparent'
+    ? 'transparent'
+    : COLOR_HEX[settings.fontColor] ?? (settings.isDarkMode ? '#000000' : '#ffffff');
+
+  const captionBg = settings.bgColor === 'Transparent'
+    ? 'transparent'
+    : BG_RGBA[settings.bgColor] ?? (settings.isDarkMode ? 'rgba(255,255,255,0.85)' : 'rgba(0,0,0,0.7)');
+
+  const windowBg = settings.windowColor === 'Transparent'
+    ? 'transparent'
+    : BG_RGBA[settings.windowColor] ?? 'transparent';
+
   const captionDirection = settings.isSideBySide ? 'column' : 'row';
 
   const captionStyle = {
@@ -168,8 +185,6 @@ export default function CaptionOverlay() {
     fontWeight: 500,
     lineHeight: 1.4,
     textShadow: '0 1px 4px rgba(0,0,0,0.9)',
-    whiteSpace: 'nowrap',
-    maxWidth: '90vw',
   };
 
   return (
@@ -180,7 +195,7 @@ export default function CaptionOverlay() {
         position: 'absolute',
         ...posStyle,
         zIndex: 100,
-        display: 'flex',
+        display: 'inline-flex',
         flexDirection: 'column',
         alignItems: 'center',
         gap: 5,
@@ -210,17 +225,37 @@ export default function CaptionOverlay() {
       </div>
 
       {hasCaption && (
-        <div style={{ display: 'flex', flexDirection: captionDirection, alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-          {captions.primary && (
-            <span style={captionStyle}>{captions.primary}</span>
-          )}
-          {captions.secondary && (
-            <span style={{ ...captionStyle, fontSize: `${sliderToRem(settings.fontSize) * 0.85}rem` }}>
-              {captions.secondary}
-            </span>
-          )}
+        <div style={{
+            display: 'flex',
+            flexDirection: captionDirection,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+        }}>
+            {captions.primary && (
+                <span style={{
+                    ...captionStyle,
+                    width: captionDirection === 'row' ? '20vw' : '35vw',
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-word',
+                    textAlign: 'center',
+                }}>
+                    {captions.primary}
+                </span>
+            )}
+            {captions.secondary && (
+                <span style={{
+                    ...captionStyle,
+                    width: captionDirection === 'row' ? '20vw' : '35vw',
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-word',
+                    textAlign: 'center',
+                }}>
+                    {captions.secondary}
+                </span>
+            )}
         </div>
-      )}
+    )}
     </div>
   );
 }

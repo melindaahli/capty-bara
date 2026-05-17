@@ -21,6 +21,7 @@ const fonts = [
 ];
 
 const colors = [
+    { value: 'Transparent', label: 'Transparent', hex: null},
     { value: 'White', label: 'White', hex: '#FFFFFF' },
     { value: 'Black', label: 'Black', hex: '#000000' },
     { value: 'Gray', label: 'Gray', hex: '#808080' },
@@ -32,7 +33,10 @@ const colors = [
 ];
 
 function save(patch) {
-    chrome.storage.sync.set(patch);
+    console.log('SAVING:', patch);
+    chrome.storage.sync.set(patch, () => {
+        console.log('SAVED successfully');
+    });
 }
 
 export default function Settings() {
@@ -46,6 +50,7 @@ export default function Settings() {
     const [bgColor, setBgColor] = useState(null);
     const [windowColor, setWindowColor] = useState(null);
     const [showAdvanced, setShowAdvanced] = useState(false);
+    const [captionsEnabled, setCaptionsEnabled] = useState(true);
 
     useEffect(() => {
         chrome.storage.sync.get([
@@ -53,16 +58,19 @@ export default function Settings() {
             'isDarkMode', 'isSideBySide',
             'fontFamily', 'fontSize',
             'fontColor', 'bgColor', 'windowColor',
+            'captionsEnabled',
         ], (result) => {
-            if (result.primaryLanguage) setPrimaryLanguage(languages.find(l => l.value === result.primaryLanguage) ?? null);
-            if (result.secondaryLanguage) setSecondaryLanguage(languages.find(l => l.value === result.secondaryLanguage) ?? null);
+            console.log('loaded:', result);
+            if (result.primaryLanguage !== undefined) setPrimaryLanguage(languages.find(l => l.value === result.primaryLanguage) ?? null);
+            if (result.secondaryLanguage !== undefined) setSecondaryLanguage(languages.find(l => l.value === result.secondaryLanguage) ?? null);
             if (result.isDarkMode !== undefined) setIsDarkMode(result.isDarkMode);
             if (result.isSideBySide !== undefined) setIsSideBySide(result.isSideBySide);
-            if (result.fontFamily) setFontFamily(fonts.find(f => f.value === result.fontFamily) ?? fonts[0]);
+            if (result.fontFamily !== undefined) setFontFamily(fonts.find(f => f.value === result.fontFamily) ?? fonts[0]);
             if (result.fontSize !== undefined) setFontSize(result.fontSize);
-            if (result.fontColor) setFontColor(colors.find(c => c.value === result.fontColor) ?? null);
-            if (result.bgColor) setBgColor(colors.find(c => c.value === result.bgColor) ?? null);
-            if (result.windowColor) setWindowColor(colors.find(c => c.value === result.windowColor) ?? null);
+            if (result.fontColor !== undefined) setFontColor(colors.find(c => c.value === result.fontColor) ?? null);
+            if (result.bgColor !== undefined) setBgColor(colors.find(c => c.value === result.bgColor) ?? null);
+            if (result.windowColor !== undefined) setWindowColor(colors.find(c => c.value === result.windowColor) ?? null);
+            if (result.captionsEnabled !== undefined) setCaptionsEnabled(result.captionsEnabled);
         });
     }, []);
 
@@ -86,6 +94,16 @@ export default function Settings() {
 
     return (
         <div className={styles.panel}>
+            <div className={styles.captionToggleRow}>
+                <span className={styles.captionToggleLabel}>Captions</span>
+                <Toggle
+                    id="captionsEnabled"
+                    label="off"
+                    rightLabel="on"
+                    checked={captionsEnabled}
+                    onChange={(val) => { setCaptionsEnabled(val); save({ captionsEnabled: val }); }}
+                />
+            </div>
             <nav className={styles.nav}>
                 <div className={styles.section}>
                     <label className={styles.sectionLabel}>LANGUAGES</label>
@@ -116,14 +134,14 @@ export default function Settings() {
                         checked={isSideBySide}
                         onChange={(val) => { setIsSideBySide(val); save({ isSideBySide: val }); }}
                     />
-                    <p className={styles.description}>appearance</p>
+                    {/* <p className={styles.description}>appearance</p>
                     <Toggle
                         id="appearance"
                         label="light"
                         rightLabel="dark"
                         checked={isDarkMode}
                         onChange={(val) => { setIsDarkMode(val); save({ isDarkMode: val }); }}
-                    />
+                    /> */}
                 </div>
                 <div className={styles.section}>
                     <label
