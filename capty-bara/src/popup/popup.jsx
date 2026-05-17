@@ -2,6 +2,9 @@
 import React, { useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 
+import Settings from './components/Settings/Settings'
+import logo from '/public/icons/logo.png';
+
 const LANGUAGES = [
   { code: 'en', label: 'English' },
   { code: 'zh', label: 'Chinese (Simplified)' },
@@ -23,6 +26,9 @@ function Popup() {
   const [secondary, setSecondary] = useState('ja')
   const [saved, setSaved] = useState(false)
 
+  //toggles
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
   useEffect(() => {
     chrome.storage.sync.get(['primaryLanguage','secondaryLanguage'], (result) => {
       if (result.primaryLanguage) setPrimary(result.primaryLanguage)
@@ -43,32 +49,13 @@ function Popup() {
   }
 
   return (
-    <div style={{ width:'280px', padding:'16px', background:'#0f0f0f', color:'#e0e0e0', fontFamily:'Arial' }}>
-      <div style={{ display:'flex', alignItems:'center', gap:'8px', marginBottom:'16px' }}>
-        <span style={{ fontSize:'24px' }}>🦫</span>
-        <span style={{ fontSize:'18px', fontWeight:'bold', color:'#2d6a9f' }}>Capty-Bara</span>
+    <div style={{ width:'280px', padding:'16px', background:'#f3f3f3' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+        <img src={logo} alt="capybara logo" style={{ maxHeight:'50px', width: '40px'}}/>
+        <span className={logo} style={{ fontSize:'18px', fontWeight:'bold', color:'#175423' }}>capty-bara</span>
       </div>
 
-      <label style={{ fontSize:'12px', color:'#888' }}>My language (L1)</label>
-      <select value={primary} onChange={e => setPrimary(e.target.value)} style={selectStyle}>
-        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
-      </select>
-
-      <label style={{ fontSize:'12px', color:'#888', display:'block', marginTop:'12px' }}>
-        Video language (L2)
-      </label>
-      <select value={secondary} onChange={e => setSecondary(e.target.value)} style={selectStyle}>
-        {LANGUAGES.map(l => <option key={l.code} value={l.code}>{l.label}</option>)}
-      </select>
-
-      <button onClick={save} style={{
-        width:'100%', padding:'10px', marginTop:'16px',
-        background: saved ? '#1a6b3c' : '#2d6a9f',
-        color:'#fff', border:'none', borderRadius:'6px',
-        fontSize:'14px', cursor:'pointer', fontWeight:'bold'
-      }}>
-        {saved ? '✓ Saved!' : 'Save Languages'}
-      </button>
+      <Settings />
 
       <p style={{ fontSize:'11px', color:'#666', marginTop:'12px', textAlign:'center' }}>
         Open a YouTube video to activate captions

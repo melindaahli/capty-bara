@@ -1,0 +1,63 @@
+.togglewrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Vertically centers the text with the switch */
+  gap: 12px;           /* Adds space between the label and the toggle */
+  margin-bottom: 8px;
+}
+
+.togglesidelabel {
+  font-size: 14px;
+  color: #333;         /* Darker color since your popup background is white */
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Container sizing */
+.toggleswitch {
+  position: relative;
+  width: 46px;
+  height: 22px;
+  flex-shrink: 0;      /* Prevents the toggle from squishing if text is long */
+}
+
+/* Hide the actual checkbox */
+.togglecheckbox {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The track (pill shape) */
+.toggleslider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+/* The sliding knob */
+.toggleslider:before {
+  position: absolute;
+  content: "";
+  height: 35px;
+  width: 35px;
+  left: -5px;
+  bottom: -7px;
+  background-image: var(--capybara-url);
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: 0.4s;
+}
+
+/* Logic for "Checked" state */
+.togglecheckbox:checked + .toggleslider {
+  background-color: #2196F3;
+}
+
+.togglecheckbox:checked + .toggleslider:before {
+  transform: translateX(24px);
+}
