@@ -42,24 +42,6 @@ function Select({ value, onChange }) {
 }
 
 function Popup() {
-  const [primary, setPrimary] = useState('en');
-  const [secondary, setSecondary] = useState('ja');
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    chrome.storage.sync.get({ primaryLang: 'en', secondaryLang: 'ja' }, (stored) => {
-      setPrimary(stored.primaryLang);
-      setSecondary(stored.secondaryLang);
-    });
-  }, []);
-
-  function save() {
-    chrome.storage.sync.set({ primaryLang: primary, secondaryLang: secondary }, () => {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 1500);
-    });
-  }
-
   return (
     <div style={{ width: 260, padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}>
       {/* Header */}
