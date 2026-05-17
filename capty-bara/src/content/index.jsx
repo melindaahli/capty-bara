@@ -14,7 +14,6 @@ function waitForPlayer() {
 }
 
 async function mount() {
-  // Don't mount twice (e.g. on YouTube SPA navigation)
   if (document.getElementById('capty-bara-root')) return;
 
   const player = await waitForPlayer();
@@ -22,6 +21,7 @@ async function mount() {
   if (getComputedStyle(player).position === 'static') {
     player.style.position = 'relative';
   }
+  player.style.overflow = 'hidden'; // ← add this
 
   const container = document.createElement('div');
   container.id = 'capty-bara-root';
