@@ -45,4 +45,4 @@ The capty-bara extension will now appear in your extensions list. Navigate to an
 
 ## Built with
 
-React, Vite, JavaScript, Tailwind CSS, youtube-transcript, express
+React, Vite, JavaScript, Tailwind CSS, Express, Nods.js, youtube-transcript library
