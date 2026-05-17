@@ -1,28 +1,79 @@
 # capty-bara
 
-A Chrome extension that overlays dual-language subtitles on YouTube videos, so immigrant families, heritage language learners, deaf and hard-of-hearing viewers, and anyone watching across a language barrier can follow along together.
+A Chrome extension that shows dual-language subtitles on YouTube videos. Watch with two languages displayed simultaneously — side by side or stacked — with full control over fonts, colors, and positioning.
 
+---
 
+## Features
 
-## How it works
+- **Dual-language captions** — display two languages at the same time
+- **6 supported languages** — English, Chinese, Japanese, Korean, Spanish, French
+- **Draggable overlay** — click and drag to reposition captions anywhere on the video
+- **Layout options** — side-by-side or stacked display
+- **Appearance customization** — font family, font size, text color, background color
+- **Persistent settings** — saved to Chrome sync storage (works across devices)
+- **Smart caching** — transcript requests are cached and deduplicated on the backend
 
-capty-bara injects a subtitle overlay directly into the YouTube player. The backend fetches the video transcript from YouTube and exposes it via API endpoints. The extension reads those endpoints and displays captions in two languages simultaneously.
+---
 
+## Project Structure
 
+```
+capty-bara/
+├── backend/              # Express server for fetching YouTube transcripts
+│   ├── index.js
+│   └── package.json
+├── src/
+│   ├── background/       # Service worker (initializes default settings)
+│   ├── content/          # Content script injected into YouTube
+│   │   ├── index.jsx
+│   │   └── CaptionOverlay.jsx
+│   ├── popup/            # Extension popup UI
+│   │   ├── Popup.jsx
+│   │   ├── popup.html
+│   │   └── components/
+│   │       ├── Settings/ # Language and display settings panel
+│   │       └── Toggle/   # Toggle component
+│   └── assets/
+├── public/icons/         # Extension icons
+├── manifest.json         # Chrome Manifest V3
+├── vite.config.js
+└── package.json
+```
 
-## Running locally
+---
 
-### 1. Start the backend
+## Tech Stack
 
-The backend handles transcript fetching and translation endpoints.
+| Layer | Technology |
+|---|---|
+| Extension frontend | React 18, Vite, vite-plugin-web-extension |
+| Backend server | Node.js, Express |
+| Transcript fetching | youtube-transcript |
+| Settings persistence | Chrome Sync Storage API |
+
+---
+
+## Setup
+
+### Prerequisites
+
+- Node.js and npm
+- Google Chrome
+
+### 1. Backend
 
 ```bash
-cd backend
+cd capty-bara/backend
 npm install
 npm start
 ```
 
-### 2. Build the extension
+The server runs on `http://localhost:3001` and exposes:
+- `GET /transcript?videoId=&lang=` — fetch full transcript
+- `GET /transcript/at-time?videoId=&lang=&time=` — get caption at a specific timestamp (seconds)
+
+### 2. Extension
 
 ```bash
 cd capty-bara
@@ -30,19 +81,37 @@ npm install
 npm run build
 ```
 
-This outputs the extension to the `dist/` folder.
+For development with watch mode:
+```bash
+npm run dev
+```
 
-### 3. Load the extension in Chrome
+### 3. Load in Chrome
 
 1. Open Chrome and go to `chrome://extensions`
-2. Enable **Developer mode** (toggle in the top right)
+2. Enable **Developer mode** (top right)
 3. Click **Load unpacked**
-4. Select the `dist/` folder
+4. Select the `capty-bara/dist` folder
 
-The capty-bara extension will now appear in your extensions list. Navigate to any YouTube video and it should be live.
+---
 
+## Usage
 
+1. Make sure the backend server is running (`npm start` in `capty-bara/backend`)
+2. Navigate to any YouTube video
+3. The caption overlay will appear automatically
+4. Click the extension icon to open settings and configure:
+   - Primary and secondary languages
+   - Layout (side-by-side or stacked)
+   - Font size, font family, text color, background color
 
-## Built with
+---
 
-React, Vite, JavaScript, Tailwind CSS, Express, Nods.js, youtube-transcript library
+## How It Works
+
+1. The **content script** injects a React component into the YouTube video player
+2. The **caption overlay** polls the backend every 500ms with the current video timestamp
+3. The **backend** fetches and caches the YouTube transcript, then returns the matching caption segment for that timestamp
+4. **Settings** are read from Chrome sync storage and update the overlay in real time via storage change listeners
+
+Transcript lookup uses a linear scan over time-ordered segments to find the one whose `[offset, offset + duration)` window contains the current playback time.
