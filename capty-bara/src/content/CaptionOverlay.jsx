@@ -4,7 +4,7 @@ const BACKEND = 'http://localhost:3001';
 
 const LANG_CODE = {
   'English': 'en',
-  'Chinese': 'zh-Hans',
+  'Chinese': 'zh-CN',
   'Korean': 'ko',
   'Japanese': 'ja',
   'Spanish': 'es',
