@@ -17,6 +17,10 @@
 .section {
     display: flex;
     flex-direction: column;
+    background-color: rgb(249, 255, 249);
+    border-radius: 10px;
+    width: 200px;
+    padding: 10px 20px;
 }
 
 .sectionLabel {

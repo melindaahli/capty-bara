@@ -55,7 +55,7 @@
 
 /* Logic for "Checked" state */
 .togglecheckbox:checked + .toggleslider {
-  background-color: #2196F3;
+  background-color: #ffaa69;
 }
 
 .togglecheckbox:checked + .toggleslider:before {

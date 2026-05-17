@@ -24,7 +24,7 @@ export default function Toggle({ id, checked, onChange, disabled, label, rightLa
           htmlFor={id}
           style={{
             '--capybara-url': `url(${capybara})`,
-            backgroundColor: checked ? '#2196F3' : '#ccc',
+            backgroundColor: checked ? '#ffaa69' : '#ccc',
             '--knob-translate': checked ? 'translateX(16px)' : 'translateX(0)',
           }}
         />

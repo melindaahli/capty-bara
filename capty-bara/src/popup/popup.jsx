@@ -49,10 +49,10 @@ function Popup() {
   }
 
   return (
-    <div style={{ width:'280px', padding:'16px', background:'#f3f3f3' }}>
+    <div style={{ width:'280px', padding:'16px', background:'#eaf1ea' }}>
       <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
         <img src={logo} alt="capybara logo" style={{ maxHeight:'50px', width: '40px'}}/>
-        <span className={logo} style={{ fontSize:'18px', fontWeight:'bold', color:'#175423' }}>capty-bara</span>
+        <span className={logo} style={{ fontSize:'25px', fontWeight:'bold', color:'#175423' }}>capty-bara</span>
       </div>
 
       <Settings />
