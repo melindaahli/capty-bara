@@ -4,53 +4,60 @@ import { fetchTranscript } from "youtube-transcript";
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Private-Network', 'true');
+app.use(cors());
+
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+//   res.setHeader('Access-Control-Allow-Private-Network', 'true');
   
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
+//   if (req.method === 'OPTIONS') {
+//     return res.sendStatus(204);
+//   }
+//   next();
+// });
 
 
 const transcriptCache = new Map();
+const failureCache = new Map(); // key → timestamp, expires after FAILURE_TTL_MS
 const fetchingPromises = new Map();
 
-const FAILED_SENTINEL = Symbol('FAILED');
+const FAILURE_TTL_MS = 30_000;
+
+// Some videos publish Chinese under zh-Hans, zh-TW, or zh instead of zh-CN.
+const LANG_FALLBACKS = {
+  'zh-CN': ['zh-CN', 'zh-Hans', 'zh-TW', 'zh-HK', 'zh'],
+};
 
 async function getTranscript(videoId, lang) {
   const key = `${videoId}:${lang}`;
-  const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-  // Check both success and failure cache
-  if (transcriptCache.has(key)) {
-    const cached = transcriptCache.get(key);
-    if (cached === FAILED_SENTINEL) return null; // already known to fail
-    return cached;
+  if (transcriptCache.has(key)) return transcriptCache.get(key);
+
+  // Failures are cached briefly — lets transient errors recover after 30s
+  if (failureCache.has(key)) {
+    if (Date.now() - failureCache.get(key) < FAILURE_TTL_MS) return null;
+    failureCache.delete(key);
   }
 
-  // Dedup in-flight requests
   if (fetchingPromises.has(key)) return fetchingPromises.get(key);
 
   const fetchLogic = (async () => {
-    try {
-      console.log("trying to fetch", { videoId, lang });
-      const transcript = await fetchTranscript(videoId, { lang });
-      transcriptCache.set(key, transcript);
-      return transcript;
-
-    } catch (err) {
-      // Cache the failure so we never retry this key
-      transcriptCache.set(key, FAILED_SENTINEL);
-      console.warn(`Transcript unavailable for ${videoId}:${lang}, won't retry.`);
-      return null;
-    } finally {
-      fetchingPromises.delete(key);
+    const candidates = LANG_FALLBACKS[lang] ?? [lang];
+    for (const code of candidates) {
+      try {
+        console.log("trying to fetch", { videoId, lang: code });
+        const transcript = await fetchTranscript(videoId, { lang: code });
+        transcriptCache.set(key, transcript);
+        return transcript;
+      } catch {
+        // try next fallback
+      }
     }
+    failureCache.set(key, Date.now());
+    console.warn(`Transcript unavailable for ${videoId}:${lang} (tried: ${candidates.join(', ')}), retrying in ${FAILURE_TTL_MS / 1000}s.`);
+    return null;
   })();
 
   fetchingPromises.set(key, fetchLogic);
@@ -96,7 +103,7 @@ app.get("/transcript/at-time", async (req, res) => {
       return res.json({ unavailable: true, text: "" });
     }
 
-    const segment = getTranscriptAtTime(transcript, parseFloat(time) + 1.5);
+    const segment = getTranscriptAtTime(transcript, parseFloat(time) + 0.5);
     res.json(segment);
   } catch (err) {
     console.error(`[/transcript/at-time] videoId=${videoId} lang=${lang} time=${time}:`, err.message);
