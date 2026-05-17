@@ -6,16 +6,45 @@ const app = express();
 app.use(cors());
 
 // Cache: "videoId:lang" -> transcript array
+
+// old version without caching:
+// const transcriptCache = new Map();
+
+// async function getTranscript(videoId, lang) {
+//   const key = `${videoId}:${lang}`;
+//   if (transcriptCache.has(key)) return transcriptCache.get(key);
+  
+//   const transcript = await fetchTranscript(videoId, lang);
+//   transcriptCache.set(key, transcript);
+//   return transcript;
+// }
+// end old version
+
+// new version with 
 const transcriptCache = new Map();
+const fetchingPromises = new Map();
 
 async function getTranscript(videoId, lang) {
   const key = `${videoId}:${lang}`;
   if (transcriptCache.has(key)) return transcriptCache.get(key);
 
-  const transcript = await fetchTranscript(`https://www.youtube.com/watch?v=${videoId}`, { lang });
-  transcriptCache.set(key, transcript);
-  return transcript;
+  if (fetchingPromises.has(key)) return fetchingPromises.get(key);
+
+  const promise = fetchTranscript(videoId, { lang })
+    .then(transcript => {
+      transcriptCache.set(key, transcript);
+      fetchingPromises.delete(key);
+      return transcript;
+    })
+    .catch(err => {
+      fetchingPromises.delete(key);
+      throw err;
+    });
+
+  fetchingPromises.set(key, promise);
+  return promise;
 }
+// end new version
 
 // Returns the caption segment active at `time` (seconds).
 // youtube-transcript offsets are in milliseconds, so convert before comparing.
@@ -46,8 +75,7 @@ app.get("/transcript/at-time", async (req, res) => {
   if (!videoId) return res.status(400).json({ error: "Missing videoId" });
   if (!lang) return res.status(400).json({ error: "Missing lang" });
   if (time === undefined) return res.status(400).json({ error: "Missing time" });
-    // if (time > 1.5)
-    //     time = time - 1.5;
+
   try {
     const transcript = await getTranscript(videoId, lang);
     const segment = getTranscriptAtTime(transcript, parseFloat(time - 1.5));
