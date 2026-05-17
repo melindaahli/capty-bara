@@ -96,7 +96,7 @@ app.get("/transcript/at-time", async (req, res) => {
       return res.json({ unavailable: true, text: "" });
     }
 
-    const segment = getTranscriptAtTime(transcript, parseFloat(time) + 1.5);
+    const segment = getTranscriptAtTime(transcript, parseFloat(time) + 0.5);
     res.json(segment);
   } catch (err) {
     console.error(`[/transcript/at-time] videoId=${videoId} lang=${lang} time=${time}:`, err.message);
