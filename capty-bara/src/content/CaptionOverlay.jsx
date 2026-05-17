@@ -172,7 +172,7 @@ export default function CaptionOverlay() {
     ? 'transparent'
     : BG_RGBA[settings.windowColor] ?? 'transparent';
 
-  const captionDirection = settings.isSideBySide ? 'row' : 'column';
+  const captionDirection = settings.isSideBySide ? 'column' : 'row';
 
   const captionStyle = {
     display: 'inline-block',
@@ -225,40 +225,37 @@ export default function CaptionOverlay() {
       </div>
 
       {hasCaption && (
-          <div style={{
-              display: 'flex',
-              flexDirection: captionDirection,
-              alignItems: captionDirection === 'row' ? 'stretch' : 'center',
-              gap: 8,
-              width: '90vw',
-              maxWidth: '90vw',
-          }}>
-              {captions.primary && (
-                  <span style={{
-                      ...captionStyle,
-                      flex: 1,
-                      minWidth: 0,
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
-                      textAlign: 'center',
-                  }}>
-                      {captions.primary}
-                  </span>
-              )}
-              {captions.secondary && (
-                  <span style={{
-                      ...captionStyle,
-                      flex: 1,
-                      minWidth: 0,
-                      whiteSpace: 'normal',
-                      wordBreak: 'break-word',
-                      textAlign: 'center',
-                  }}>
-                      {captions.secondary}
-                  </span>
-              )}
-          </div>
-      )}
+        <div style={{
+            display: 'flex',
+            flexDirection: captionDirection,
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+        }}>
+            {captions.primary && (
+                <span style={{
+                    ...captionStyle,
+                    width: captionDirection === 'row' ? '20vw' : '35vw',
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-word',
+                    textAlign: 'center',
+                }}>
+                    {captions.primary}
+                </span>
+            )}
+            {captions.secondary && (
+                <span style={{
+                    ...captionStyle,
+                    width: captionDirection === 'row' ? '20vw' : '35vw',
+                    whiteSpace: 'normal',
+                    wordBreak: 'break-word',
+                    textAlign: 'center',
+                }}>
+                    {captions.secondary}
+                </span>
+            )}
+        </div>
+    )}
     </div>
   );
 }
