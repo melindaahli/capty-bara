@@ -53,6 +53,20 @@
     flex-direction: column;
 }
 
+.captionToggleRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.captionToggleLabel {
+    font-weight: bold;
+    font-size: 16px;
+}
+
 /* slider */
 .fontSizeRow {
     display: flex;
