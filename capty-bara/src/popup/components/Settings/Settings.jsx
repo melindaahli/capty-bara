@@ -23,7 +23,12 @@ const fonts = [
 const colors = [
     { value: 'White', label: 'White', hex: '#FFFFFF' },
     { value: 'Black', label: 'Black', hex: '#000000' },
-    { value: 'Gray', label: 'Gray', hex: '#808080' }
+    { value: 'Gray', label: 'Gray', hex: '#808080' },
+    { value: 'Yellow', label: 'Yellow', hex: '#FFFF00' },
+    { value: 'Purple', label: 'Purple', hex: '#5000a0' },
+    { value: 'Red', label: 'Red', hex: '#FF0000' },
+    { value: 'Green', label: 'Green', hex: '#00FF00' },
+    { value: 'Blue', label: 'Blue', hex: '#0000FF' },
 ];
 
 function save(patch) {

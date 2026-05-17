@@ -4,7 +4,7 @@ const BACKEND = 'http://localhost:3001';
 
 const LANG_CODE = {
   'English': 'en',
-  'Chinese': 'zh',
+  'Chinese': 'zh-Hans',
   'Korean': 'ko',
   'Japanese': 'ja',
   'Spanish': 'es',
@@ -12,15 +12,27 @@ const LANG_CODE = {
 };
 
 const COLOR_HEX = {
+  'Default': null,
   'White': '#FFFFFF',
   'Black': '#000000',
   'Gray': '#808080',
+  'Yellow': '#FFFF00',
+  'Purple': '#5000a0',
+  'Red': '#FF0000',
+  'Green': '#00FF00',
+  'Blue': '#0000FF',
 };
 
 const BG_RGBA = {
+  'Default': null,
   'White': 'rgba(255,255,255,0.85)',
   'Black': 'rgba(0,0,0,0.7)',
   'Gray': 'rgba(128,128,128,0.7)',
+  'Yellow': 'rgba(255,255,0,0.7)',
+  'Purple': 'rgba(80,0,160,0.7)',
+  'Red': 'rgba(255,0,0,0.7)',
+  'Green': 'rgba(0,255,0,0.7)',
+  'Blue': 'rgba(0,0,255,0.7)',
 };
 
 const FONT_FAMILY = {
